@@ -19,7 +19,8 @@ public class Arithmetic {
      * @param b Value 2
      * @return Sum of a and b
      * */
+    /* finish the sum*/
     public static int sum(int a, int b) {
-        return a * b;
+        return a + b;
     }
 }
