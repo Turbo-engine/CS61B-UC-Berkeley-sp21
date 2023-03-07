@@ -1,11 +1,12 @@
 package game2048;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Formatter;
 import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author Turbo_engine
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -110,16 +111,61 @@ public class Model extends Observable {
         boolean changed;
         changed = false;
 
+        //System.out.println(this.board.tile(1,3).value());
+
+        board.setViewingPerspective(side);
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        //todo：change pos
+        changed = upTiltIfExistZero(this.board);
+        changed = upTiltIfAreSame(this.board)||changed;
+        changed = upTiltIfExistZero(this.board)||changed;
 
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
     }
+
+    /* move tile up if is 0*/
+    public boolean upTiltIfExistZero(Board b){
+        boolean changed = false;
+        for(int i = 0;i < b.size();i++){
+            for(int j = b.size()-1;j >= 0;j--){
+                int numToTop = j;
+                while(numToTop < b.size()-1 && b.tile(i,numToTop+1) == null && b.tile(i,numToTop) != null){
+                    changed = true;
+                    this.board.move(i,numToTop + 1,b.tile(i,numToTop));
+                    numToTop++;
+                }
+            }
+        }
+        return changed;
+    }
+
+    /* Merge tile up if tiles are same*/
+    public boolean upTiltIfAreSame(Board b){
+        boolean changed = false;
+        for(int i = 0;i < b.size();i++){
+            for(int j = b.size()-1;j >= 0;j--){
+                int numToTop = j;
+                if(numToTop < b.size()-1 && b.tile(i,numToTop+1) != null && b.tile(i,numToTop) != null){
+                    if(b.tile(i,numToTop+1).value() == b.tile(i,numToTop).value() ){
+                        changed = true;
+                        b.tile(i, numToTop).merge(i,numToTop+1,b.tile(i,numToTop+1));
+                        this.score += b.tile(i, numToTop).value()*2;
+                        this.board.move(i,numToTop + 1,b.tile(i,numToTop));
+                    }
+                    numToTop++;
+                }
+            }
+        }
+        return changed;
+    }
+
 
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
@@ -137,7 +183,11 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        for(int i = 0;i < b.size();i++){
+            for(int j = 0;j < b.size();j++) {
+                if(b.tile(i,j) == null) return true;
+            }
+        }
         return false;
     }
 
@@ -147,7 +197,12 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        for(int i = 0;i < b.size();i++){
+            for(int j = 0;j < b.size();j++) {
+                if(b.tile(i,j) != null && b.tile(i,j).value() == MAX_PIECE)
+                    return true;
+            }
+        }
         return false;
     }
 
@@ -158,7 +213,19 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        if(emptySpaceExists(b))return true;
+        for(int i = 0;i < b.size();i++){
+            for(int j = 0;j < b.size();j++){
+                if(i != 0){
+                    if(b.tile(i-1,j).value() == b.tile(i,j).value())
+                        return true;
+                }
+                if(j != 0){
+                    if(b.tile(i,j-1).value() == b.tile(i,j).value())
+                        return true;
+                }
+            }
+        }
         return false;
     }
 
