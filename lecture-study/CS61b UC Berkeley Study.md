@@ -107,7 +107,7 @@ public static int nextNumber(int n) {
 }
 ```
 
-![Pass1](./pasted-images/Pasted-image-20230228094634.PNG)
+![Pass1](./pasted-images/Pasted-image-20230228094634.png)
 
 ## 3.Testing
 
